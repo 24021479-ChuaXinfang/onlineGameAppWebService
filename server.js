@@ -57,9 +57,22 @@ app.post('/updategame', async (req, res) => {
     try {
         let connection = await mysql.createConnection(dbConfig);
         await connection.execute('UPDATE games SET game_name = ?, game_cover = ? WHERE id = ?', [game_name, game_cover, id]);
-        res.status(201).json({message: 'Game ' + game_name + ' updated successfully'});
+        res.status(200).json({message: 'Game with id ' + id + ' updated successfully'});
     } catch (err) {
         console.error(err);
-        res.status(500).json({message: 'Server error - could not update game ' + game_name});
+        res.status(500).json({message: 'Server error - could not update game with id ' + id});
+    }
+});
+
+// Route: delete game
+app.post('/deletegame', async (req, res) => {
+    const { id } = req.body;
+    try {
+        let connection = await mysql.createConnection(dbConfig);
+        await connection.execute('DELETE FROM games WHERE id = ?', [id]);
+        res.status(200).json({message: 'Game with id ' + id + ' deleted successfully'});
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({message: 'Server error - could not delete game with id ' + id});
     }
 });

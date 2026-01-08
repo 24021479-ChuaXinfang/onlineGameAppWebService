@@ -13,6 +13,13 @@ https://onlinegameappwebservice-ndoc.onrender.com/addgame
 }
 
 Update game:
+https://onlinegameappwebservice-ndoc.onrender.com/updategame
+
+{
+"id": 1,
+"game_name": "Persona 5 Tactica",
+"game_cover": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSovsPYjo-oYA-yMJkqxTl4r8_KTAjqjsK_6kXLNgkjkrvh9iyJGiJ3&usqp=CAE&s"
+}
 
 Delete game using GET:
 
