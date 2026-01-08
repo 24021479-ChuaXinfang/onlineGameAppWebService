@@ -21,7 +21,10 @@ https://onlinegameappwebservice-ndoc.onrender.com/updategame
 "game_cover": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSovsPYjo-oYA-yMJkqxTl4r8_KTAjqjsK_6kXLNgkjkrvh9iyJGiJ3&usqp=CAE&s"
 }
 
-Delete game using GET:
-
 Delete game using POST:
+https://onlinegameappwebservice-ndoc.onrender.com/deletegame
+
+{
+"id": 2
+}
 

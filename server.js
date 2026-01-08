@@ -64,7 +64,7 @@ app.post('/updategame', async (req, res) => {
     }
 });
 
-// Route: delete game
+//Route: delete game
 app.post('/deletegame', async (req, res) => {
     const { id } = req.body;
     try {
