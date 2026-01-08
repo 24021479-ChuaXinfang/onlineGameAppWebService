@@ -37,3 +37,16 @@ app.get('/allgames', async (req, res) => {
         res.status(500).json({message: 'Server error for allgames'});
     }
 });
+
+// Route: add game
+app.post('/addgame', async (req, res) => {
+    const { game_name, game_cover } = req.body;
+    try {
+        let connection = await mysql.createConnection(dbConfig);
+        await connection.execute('INSERT INTO games (game_name, game_cover) VALUES (?, ?)', [game_name, game_cover]);
+        res.status(201).json({message: 'Game ' + game_name + ' added successfully'});
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({message: 'Server error - could not add game ' + game_name});
+    }
+});
