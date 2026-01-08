@@ -50,3 +50,16 @@ app.post('/addgame', async (req, res) => {
         res.status(500).json({message: 'Server error - could not add game ' + game_name});
     }
 });
+
+// Route: update existing game
+app.post('/updategame', async (req, res) => {
+    const { id, game_name, game_cover } = req.body;
+    try {
+        let connection = await mysql.createConnection(dbConfig);
+        await connection.execute('UPDATE games SET game_name = ?, game_cover = ? WHERE id = ?', [game_name, game_cover, id]);
+        res.status(201).json({message: 'Game ' + game_name + ' updated successfully'});
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({message: 'Server error - could not update game ' + game_name});
+    }
+});
