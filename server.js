@@ -53,27 +53,47 @@ app.post('/addgame', async (req, res) => {
 
 // Route: update existing game
 app.put('/updategame/:id', async (req, res) => {
-    const {game_name, game_cover, game_year } = req.body;
     const { id } = req.params;
+    const { game_name, game_cover, game_year } = req.body;
+
     try {
-        let connection = await mysql.createConnection(dbConfig);
-        await connection.execute('UPDATE games SET game_name = ?, game_cover = ?, game_year = ? WHERE id = ?', [game_name, game_cover, game_year, id]);
-        res.status(200).json({message: 'Game with id ' + id + ' updated successfully'});
+        const connection = await mysql.createConnection(dbConfig);
+
+        const [result] = await connection.execute(
+            'UPDATE games SET game_name = ?, game_cover = ?, game_year = ? WHERE id = ?',
+            [game_name, game_cover, game_year, id]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Game not found' });
+        }
+
+        res.json({ message: `Game ${id} updated successfully` });
     } catch (err) {
         console.error(err);
-        res.status(500).json({message: 'Server error - could not update game with id ' + id});
+        res.status(500).json({ message: 'Server error updating game' });
     }
 });
 
 //Route: delete game
 app.delete('/deletegame/:id', async (req, res) => {
     const { id } = req.params;
+
     try {
-        let connection = await mysql.createConnection(dbConfig);
-        await connection.execute('DELETE FROM games WHERE id = ?', [id]);
-        res.status(200).json({message: 'Game with id ' + id + ' deleted successfully'});
+        const connection = await mysql.createConnection(dbConfig);
+
+        const [result] = await connection.execute(
+            'DELETE FROM games WHERE id = ?',
+            [id]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Game not found' });
+        }
+
+        res.json({ message: `Game ${id} deleted successfully` });
     } catch (err) {
         console.error(err);
-        res.status(500).json({message: 'Server error - could not delete game with id ' + id});
+        res.status(500).json({ message: 'Server error deleting game' });
     }
 });
