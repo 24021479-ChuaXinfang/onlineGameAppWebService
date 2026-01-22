@@ -40,10 +40,10 @@ app.get('/allgames', async (req, res) => {
 
 // Route: add game
 app.post('/addgame', async (req, res) => {
-    const { game_name, game_cover } = req.body;
+    const { game_name, game_cover, game_year } = req.body;
     try {
         let connection = await mysql.createConnection(dbConfig);
-        await connection.execute('INSERT INTO games (game_name, game_cover) VALUES (?, ?)', [game_name, game_cover]);
+        await connection.execute('INSERT INTO games (game_name, game_cover, game_year) VALUES (?, ?, ?)', [game_name, game_cover, game_year]);
         res.status(201).json({message: 'Game ' + game_name + ' added successfully'});
     } catch (err) {
         console.error(err);
