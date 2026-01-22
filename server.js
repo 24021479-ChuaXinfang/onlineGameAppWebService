@@ -52,11 +52,11 @@ app.post('/addgame', async (req, res) => {
 });
 
 // Route: update existing game
-app.post('/updategame', async (req, res) => {
-    const { id, game_name, game_cover } = req.body;
+app.post('/updategame/:id', async (req, res) => {
+    const { id, game_name, game_cover, game_year } = req.body;
     try {
         let connection = await mysql.createConnection(dbConfig);
-        await connection.execute('UPDATE games SET game_name = ?, game_cover = ? WHERE id = ?', [game_name, game_cover, id]);
+        await connection.execute('UPDATE games SET game_name = ?, game_cover = ?, game_year = ? WHERE id = ?', [game_name, game_cover, game_year, id]);
         res.status(200).json({message: 'Game with id ' + id + ' updated successfully'});
     } catch (err) {
         console.error(err);
@@ -65,7 +65,7 @@ app.post('/updategame', async (req, res) => {
 });
 
 //Route: delete game
-app.post('/deletegame', async (req, res) => {
+app.post('/deletegame/:id', async (req, res) => {
     const { id } = req.body;
     try {
         let connection = await mysql.createConnection(dbConfig);
