@@ -53,7 +53,8 @@ app.post('/addgame', async (req, res) => {
 
 // Route: update existing game
 app.put('/updategame/:id', async (req, res) => {
-    const { id, game_name, game_cover, game_year } = req.body;
+    const {game_name, game_cover, game_year } = req.body;
+    const { id } = req.params;
     try {
         let connection = await mysql.createConnection(dbConfig);
         await connection.execute('UPDATE games SET game_name = ?, game_cover = ?, game_year = ? WHERE id = ?', [game_name, game_cover, game_year, id]);
@@ -66,7 +67,7 @@ app.put('/updategame/:id', async (req, res) => {
 
 //Route: delete game
 app.delete('/deletegame/:id', async (req, res) => {
-    const { id } = req.body;
+    const { id } = req.params;
     try {
         let connection = await mysql.createConnection(dbConfig);
         await connection.execute('DELETE FROM games WHERE id = ?', [id]);
