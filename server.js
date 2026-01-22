@@ -4,7 +4,9 @@ const mysql = require('mysql2/promise');
 require('dotenv').config();
 const port = 3000;
 
-// database config info
+const app = express();
+
+// Use connection pool instead of creating new connection each time
 const dbConfig = {
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -12,81 +14,54 @@ const dbConfig = {
     database: process.env.DB_NAME,
     port: process.env.DB_PORT,
     waitForConnections: true,
-    connectionLimit: 100,
+    connectionLimit: 10, // smaller pool is fine
     queueLimit: 0,
 };
+const pool = mysql.createPool(dbConfig);
 
-//intialize Express app
-const app = express();
-
+// CORS - allow all origins for React Native (can restrict later)
 const cors = require("cors");
-const allowedOrigins = [
-    "http://localhost:3000",
-    "https://xf-py-card-management-app.vercel.app",
-    "https://onlinegameappwebservice-ho00.onrender.com"
-];
-
-app.use(
-    cors({
-        origin: function (origin, callback) {
-// allow requests with no origin (Postman/server-to-server)
-            if (!origin) return callback(null, true);
-            if (allowedOrigins.includes(origin)) {
-                return callback(null, true);
-            }
-            return callback(new Error("Not allowed by CORS"));
-        },
-        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allowedHeaders: ["Content-Type", "Authorization"],
-        credentials: false,
-    })
-);
-
-// helps app to read JSON
+app.use(cors());
 app.use(express.json());
 
-// start the server
-app.listen(port, () => {
-    console.log('Server running on port', port);
-});
+// Start server
+app.listen(port, () => console.log(`Server running on port ${port}`));
 
+// --- Routes ---
 
-// Route: Get all cards
+// Get all games
 app.get('/allgames', async (req, res) => {
     try {
-        let connection = await mysql.createConnection(dbConfig);
-        const [rows] = await connection.execute('SELECT * FROM games');
+        const [rows] = await pool.execute('SELECT * FROM games');
         res.json(rows);
     } catch (err) {
         console.error(err);
-        res.status(500).json({message: 'Server error for allgames'});
+        res.status(500).json({ message: 'Server error for allgames' });
     }
 });
 
-// Route: Add card
+// Add game
 app.post('/addgame', async (req, res) => {
     const { game_name, game_cover, game_year } = req.body;
     try {
-        let connection = await mysql.createConnection(dbConfig);
-        await connection.execute('INSERT INTO games (game_name, game_cover, game_year) VALUES (?, ?, ?)', [game_name, game_cover,game_year]);
-        res.status(201).json({message: 'Gane ' + game_name + ' added successfully'});
+        await pool.execute(
+            'INSERT INTO games (game_name, game_cover, game_year) VALUES (?, ?, ?)',
+            [game_name, game_cover, game_year]
+        );
+        res.status(201).json({ message: `Game ${game_name} added successfully` });
     } catch (err) {
         console.error(err);
-        res.status(500).json({message: 'Server error - could not add game ' + game_name});
+        res.status(500).json({ message: `Server error - could not add game ${game_name}` });
     }
 });
 
-// Route: Delete card
+// Delete game
 app.delete('/deletegame/:id', async (req, res) => {
     const { id } = req.params;
+    console.log("Delete request received for id:", id);
 
     try {
-        const connection = await mysql.createConnection(dbConfig);
-
-        const [result] = await connection.execute(
-            'DELETE FROM games WHERE id = ?',
-            [id]
-        );
+        const [result] = await pool.execute('DELETE FROM games WHERE id = ?', [id]);
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: 'Game not found' });
@@ -99,17 +74,16 @@ app.delete('/deletegame/:id', async (req, res) => {
     }
 });
 
-// Route: Update card
+// Update game
 app.put('/updategame/:id', async (req, res) => {
     const { id } = req.params;
-    const { game_name, game_cover,game_year } = req.body;
+    const { game_name, game_cover, game_year } = req.body;
+    console.log("Update request received:", req.body);
 
     try {
-        const connection = await mysql.createConnection(dbConfig);
-
-        const [result] = await connection.execute(
+        const [result] = await pool.execute(
             'UPDATE games SET game_name = ?, game_cover = ?, game_year = ? WHERE id = ?',
-            [game_name, game_cover, game_year, id]
+            [game_name, game_cover, parseInt(game_year), id]
         );
 
         if (result.affectedRows === 0) {
