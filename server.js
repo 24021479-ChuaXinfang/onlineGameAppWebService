@@ -52,7 +52,7 @@ app.post('/addgame', async (req, res) => {
 });
 
 // Route: update existing game
-app.post('/updategame/:id', async (req, res) => {
+app.put('/updategame/:id', async (req, res) => {
     const { id, game_name, game_cover, game_year } = req.body;
     try {
         let connection = await mysql.createConnection(dbConfig);
@@ -65,7 +65,7 @@ app.post('/updategame/:id', async (req, res) => {
 });
 
 //Route: delete game
-app.post('/deletegame/:id', async (req, res) => {
+app.delete('/deletegame/:id', async (req, res) => {
     const { id } = req.body;
     try {
         let connection = await mysql.createConnection(dbConfig);
